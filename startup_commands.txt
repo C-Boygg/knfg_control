@@ -1,0 +1,15 @@
+# Stage 4: test all commands
+ls
+cd home
+cd user
+ls
+cd projects
+ls
+cd /
+whoami
+uname
+uname -a
+echo $USERNAME
+cd nonexistent
+ls fakepath
+badcommand arg1 arg2

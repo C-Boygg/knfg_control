@@ -1,0 +1,15 @@
+# VFS test script
+ls
+cd home
+ls
+cd user
+ls
+cd projects
+ls
+cd ..
+ls
+cd /
+ls
+cd nonexistent
+ls fakepath
+cd ..

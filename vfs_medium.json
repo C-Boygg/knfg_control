@@ -1,0 +1,15 @@
+{
+  "name": "/",
+  "type": "dir",
+  "children": [
+    {"name": "file1.txt", "type": "file", "content": "SGVsbG8gV29ybGQ="},
+    {"name": "file2.txt", "type": "file", "content": "VGVzdCBmaWxl"},
+    {
+      "name": "docs",
+      "type": "dir",
+      "children": [
+        {"name": "readme.md", "type": "file", "content": "UmVhZG1l"}
+      ]
+    }
+  ]
+}

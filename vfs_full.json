@@ -1,0 +1,59 @@
+{
+  "name": "/",
+  "type": "dir",
+  "children": [
+    {
+      "name": "home",
+      "type": "dir",
+      "children": [
+        {
+          "name": "user",
+          "type": "dir",
+          "children": [
+            {"name": "notes.txt", "type": "file", "content": "Tm90ZXM="},
+            {
+              "name": "projects",
+              "type": "dir",
+              "children": [
+                {"name": "main.py", "type": "file", "content": "cHJpbnQoJ2hpJyk="},
+                {"name": "utils.py", "type": "file", "content": "ZGVmIGhlbHBlcigpOiBwYXNz"}
+              ]
+            },
+            {
+              "name": "documents",
+              "type": "dir",
+              "children": [
+                {"name": "report.txt", "type": "file", "content": "UmVwb3J0IGRhdGE="}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "etc",
+      "type": "dir",
+      "children": [
+        {"name": "config.cfg", "type": "file", "content": "a2V5PXZhbHVl"}
+      ]
+    },
+    {
+      "name": "tmp",
+      "type": "dir",
+      "children": []
+    },
+    {
+      "name": "var",
+      "type": "dir",
+      "children": [
+        {
+          "name": "log",
+          "type": "dir",
+          "children": [
+            {"name": "syslog.txt", "type": "file", "content": "bG9nIGVudHJ5"}
+          ]
+        }
+      ]
+    }
+  ]
+}

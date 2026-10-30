@@ -1,0 +1,16 @@
+# Stage 5: test mkdir
+ls
+mkdir newdir
+ls
+cd newdir
+ls
+cd /
+mkdir home/user/newproject
+cd home/user/newproject
+ls
+cd /
+mkdir
+mkdir home
+mkdir home/user/projects/sub1
+ls home/user/projects
+mkdir a/b/c
