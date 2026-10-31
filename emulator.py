@@ -15,9 +15,37 @@ class VFS:
         if data is None:
             self.root = {"name": "/", "type": "dir", "children": []}
         else:
-            self.root = data
+            self.root = self._decode_vfs(data)
         self.cwd = "/"
         self.prev_cwd = "/"
+
+    def _decode_vfs(self, node):
+        if node["type"] == "file" and "content" in node:
+            if isinstance(node["content"], str):
+                try:
+                    node["content"] = base64.b64decode(node["content"])
+                except Exception:
+                    pass
+        elif node["type"] == "dir" and "children" in node:
+            for child in node["children"]:
+                self._decode_vfs(child)
+        return node
+
+    def _encode_vfs(self, node):
+        if node["type"] == "file" and "content" in node:
+            if isinstance(node["content"], bytes):
+                node["content"] = base64.b64encode(node["content"]).decode('utf-8')
+        elif node["type"] == "dir" and "children" in node:
+            for child in node["children"]:
+                self._encode_vfs(child)
+        return node
+
+    def save_to_json(self, filepath):
+        import copy
+        data = copy.deepcopy(self.root)
+        encoded_data = self._encode_vfs(data)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(encoded_data, f, indent=2, ensure_ascii=False)
 
     def _resolve(self, path):
         if not path or path == "~":
@@ -104,6 +132,46 @@ class VFS:
         })
         return None
 
+    def make_file(self, path, content=b""):
+        target = self._resolve(path)
+        parts = target.strip("/").split("/")
+        if not parts or (len(parts) == 1 and parts[0] == ""):
+            return "touch: cannot create file '/': Is a directory"
+        parent_path = "/" + "/".join(parts[:-1]) if len(parts) > 1 else "/"
+        file_name = parts[-1]
+        parent = self._find_node(parent_path)
+        if parent is None:
+            return f"touch: cannot create file '{path}': No such file or directory"
+        if parent["type"] != "dir":
+            return f"touch: cannot create file '{path}': Not a directory"
+        for i, child in enumerate(parent.get("children", [])):
+            if child["name"] == file_name:
+                if child["type"] == "dir":
+                    return f"touch: cannot create file '{path}': Is a directory"
+                parent["children"][i]["content"] = content if isinstance(content, bytes) else content.encode('utf-8')
+                return None
+        parent.setdefault("children", []).append({
+            "name": file_name,
+            "type": "file",
+            "content": content if isinstance(content, bytes) else content.encode('utf-8')
+        })
+        return None
+
+    def read_file(self, path):
+        target = self._resolve(path)
+        node = self._find_node(target)
+        if node is None:
+            return None, f"cat: {path}: No such file or directory"
+        if node["type"] != "file":
+            return None, f"cat: {path}: Is a directory"
+        content = node.get("content", b"")
+        if isinstance(content, bytes):
+            try:
+                return content.decode('utf-8'), None
+            except UnicodeDecodeError:
+                return "[Binary file]", None
+        return str(content), None
+
 
 class Shell:
     def __init__(self, vfs):
@@ -145,6 +213,10 @@ class Shell:
             return self.username
         elif cmd == "mkdir":
             return self._cmd_mkdir(args)
+        elif cmd == "touch":
+            return self._cmd_touch(args)
+        elif cmd == "cat":
+            return self._cmd_cat(args)
         else:
             return f"{cmd}: command not found"
 
@@ -172,6 +244,20 @@ class Shell:
             return "mkdir: missing operand"
         err = self.vfs.make_dir(args[0])
         return err if err else ""
+
+    def _cmd_touch(self, args):
+        if not args:
+            return "touch: missing operand"
+        err = self.vfs.make_file(args[0])
+        return err if err else ""
+
+    def _cmd_cat(self, args):
+        if not args:
+            return "cat: missing operand"
+        content, err = self.vfs.read_file(args[0])
+        if err:
+            return err
+        return content
 
 
 class EmulatorGUI:

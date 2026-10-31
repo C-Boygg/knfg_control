@@ -9,7 +9,6 @@ cd /
 whoami
 uname
 uname -a
-echo $USERNAME
 cd nonexistent
 ls fakepath
 badcommand arg1 arg2
